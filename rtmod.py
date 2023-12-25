@@ -7,7 +7,7 @@ DEFAULT_70CM_OFFSET = '5.00 MHz'
 # insert a column with a default value
 def add_filled_column(sheet, col, name, value):
     sheet.insert_cols(idx=col, amount=1)
-    sheet.cell(row=1, col=col).value = name
+    sheet.cell(row=1, column=col).value = name
     for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=col, max_col=col):
         row[0].value = value
 
@@ -19,7 +19,7 @@ def main():
     args = parser.parse_args()
 
     workbook = openpyxl.load_workbook(args.input)
-    sheet = workbook.get_sheet_by_name(args.sheet)
+    sheet = workbook[args.sheet]
 
     # change the offset direction column to two columns: 'Offset Frequency', and 'Offset Direction'
     # 'Offset Direction' is Plus, Minus, Simplex instead of +, -, blank
@@ -75,8 +75,8 @@ def main():
         add_filled_column(sheet, 23, 'Clock Shift', 'Off')
 
         # insert the memory bank columns
-        for i in range(24, 47):
-            add_filled_column(sheet, i, f'BANK {i}', 'Off')
+        for i in range(1, 25):
+            add_filled_column(sheet, i + 23, f'BANK {i}', 'Off')
 
     else:
         print(f"Unexpected value in D1: {sheet['D1'].value}, exiting without modifying")
