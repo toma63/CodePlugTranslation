@@ -11,15 +11,24 @@ def add_filled_column(sheet, col, name, value):
     for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=col, max_col=col):
         row[0].value = value
 
-def main():
-    parser = argparse.ArgumentParser(description='Modify repeaterbook export for ft-70D import')
-    parser.add_argument('-i', '--input', help='Input file in repeaterbook format', required=True)
-    parser.add_argument('-o', '--output', help='Output file in RT System FT-70D format', required=True)
-    parser.add_argument('-s', '--sheet', help='sheet to modify', default='Import')
-    args = parser.parse_args()
+def populate_anytone(workbook, anytone_sheet_name='Anytone', source_sheet_name='Import'):
+    "populate the specified sheet in anytone format from a sheet in ft70 format"
 
-    workbook = openpyxl.load_workbook(args.input)
-    sheet = workbook[args.sheet]
+    source_sheet = workbook[source_sheet_name]
+    anytone_sheet = workbook.create_sheet(anytone_sheet_name)
+    
+    # populate channel numbers with a counter
+    anytone_sheet['A1'] = 'No.'
+    rowctr = 1
+    for row in anytone_sheet.iter_rows(min_row=2, max_row=source_sheet.max_row, min_col=1, max_col=1):
+        row[0].value = rowctr
+        rowctr += 1
+
+    # now add name, rx freq, tx freq, channel type, tx pwr, bw, ctcss dec, ctcss enc, everything else defaulted
+
+def translate_repeaterbook(workbook, sheet_name):
+    "translate the named sheet from repeaterbook to ft70 format"
+    sheet = workbook[sheet_name]
 
     # change the offset direction column to two columns: 'Offset Frequency', and 'Offset Direction'
     # 'Offset Direction' is Plus, Minus, Simplex instead of +, -, blank
@@ -82,6 +91,27 @@ def main():
         print(f"Unexpected value in D1: {sheet['D1'].value}, exiting without modifying")
         exit(1)
 
+
+def main():
+    parser = argparse.ArgumentParser(description='Convert code plugs between formats')
+    parser.add_argument('-i', '--input', help='Input file', required=True)
+    parser.add_argument('-o', '--output', help='Output file', required=True)
+    parser.add_argument('-s', '--sheet', help='sheet to modify or translate', default='Import')
+    parser.add_argument('-a', '--anytone', help='sheet name to create in anytone cps format')
+    parser.add_argument('-y', '--yaesu', help='sheet in repeaterbook format to modify to RTSystems FT70 format')
+    args = parser.parse_args()
+
+    if not args.anytone and not args.yaesu:
+        print("Error, must specify either anytone or yaesu")
+        exit(1)
+
+    workbook = openpyxl.load_workbook(args.input)
+
+    if args.anytone:
+        populate_anytone(workbook, 'Anytone', args.sheet)
+    else:
+        translate_repeaterbook(workbook, args.sheet)
+    
     workbook.save(args.output)
 
 if __name__ == '__main__':
