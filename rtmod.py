@@ -24,8 +24,7 @@ def populate_anytone(workbook, anytone_sheet_name='Anytone', source_sheet_name='
         row[0].value = rowctr
         rowctr += 1
 
-    # now add name, rx freq, tx freq, channel type, tx pwr, bw, ctcss dec, ctcss enc, everything else defaulted
-    # list of all column headings
+    # list of all column headings and defaults, use to set up defaults
     headers =  ["No.","Channel Name","Receive Frequency","Transmit Frequency","Channel Type","Transmit Power","Band Width",
                 "CTCSS/DCS Decode","CTCSS/DCS Encode","Contact","Contact Call Type","Contact TG/DMR ID","Radio ID",
                 "Busy Lock/TX Permit","Squelch Mode","Optional Signal","DTMF ID","2Tone ID","5Tone ID","PTT ID","Color Code",
@@ -38,9 +37,30 @@ def populate_anytone(workbook, anytone_sheet_name='Anytone', source_sheet_name='
                 "Off","Carrier","Off",1,1,1,"Off",1,1,"None","None","Off","Off","Off","Off","Normal Encryption","Off","Off",
                 "Off","Off",251.1,0,"Off","On","Off","Off","Off","Off",1,0,"Off",0,0,0,0,0,0,0,0]
     colnum = 2
-    for header, default in list(zip(headers[1:], defaults[1:])):
+    for header, default in zip(headers[1:], defaults[1:]):
         add_filled_column(anytone_sheet, colnum, header, default)
         colnum += 1
+    # now add name, rx freq, tx freq, channel type, tx pwr, bw, ctcss dec, ctcss enc
+    for row in anytone_sheet.iter_rows(min_row=2, max_row=anytone_sheet.max_row, min_col=2, max_col=9):
+        row_idx = row[0].row
+        for cell in row:
+            # handle name
+            if cell.column == 2:
+                cell.value = source_sheet.cell(row=row_idx, column=8).value
+            # handle rx freq
+            if cell.column == 3:
+                cell.value = source_sheet.cell(row=row_idx, column=2).value
+            # handle tx freq
+            if cell.column == 4:
+                cell.value = source_sheet.cell(row=row_idx, column=3).value
+            # skip defaulted 5, 6, 7
+            # handle 8 rx ctcss only if col 10 is 'T SQL'
+            if cell.column == 8:
+                if source_sheet.cell(row=row_idx, column=10).value == 'T SQL':
+                    cell.value = source_sheet.cell(row=row_idx, column=11).value
+            # handle 9 tx ctcss
+            if cell.column == 9:
+                cell.value = source_sheet.cell(row=row_idx, column=11).value
 
 def translate_repeaterbook(workbook, sheet_name):
     "translate the named sheet from repeaterbook to ft70 format"
