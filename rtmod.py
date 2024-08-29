@@ -11,6 +11,10 @@ def add_filled_column(sheet, col, name, value):
     for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=col, max_col=col):
         row[0].value = value
 
+def fix_ctcss(tone_string):
+    "remove Hz from the end and make it an integer"
+    return float(tone_string[:-3])
+
 def populate_anytone(workbook, anytone_sheet_name='Anytone', source_sheet_name='Import'):
     "populate the specified sheet in anytone format from a sheet in ft70 format"
 
@@ -57,10 +61,10 @@ def populate_anytone(workbook, anytone_sheet_name='Anytone', source_sheet_name='
             # handle 8 rx ctcss only if col 10 is 'T SQL'
             if cell.column == 8:
                 if source_sheet.cell(row=row_idx, column=10).value == 'T SQL':
-                    cell.value = source_sheet.cell(row=row_idx, column=11).value
+                    cell.value = fix_ctcss(source_sheet.cell(row=row_idx, column=11).value)
             # handle 9 tx ctcss
             if cell.column == 9:
-                cell.value = source_sheet.cell(row=row_idx, column=11).value
+                cell.value = fix_ctcss(source_sheet.cell(row=row_idx, column=11).value)
 
 
 def translate_repeaterbook(workbook, sheet_name):
