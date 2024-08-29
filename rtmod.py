@@ -33,7 +33,7 @@ def populate_anytone(workbook, anytone_sheet_name='Anytone', source_sheet_name='
                 "Through Mode","APRS RX","Analog APRS PTT Mode","Digital APRS PTT Mode","APRS Report Type",
                 "Digital APRS Report Channel","Correct Frequency[Hz]","SMS Confirmation","Exclude channel from roaming","DMR MODE",
                 "DataACK Disable","R5toneBot","R5ToneEot","Auto Scan","Ana Aprs Mute","Send Talker Alias"]
-    defaults = [9,"KO6DVB",440.65000,445.65000,"A-Analog","Turbo","25K","Off",94.8,"Contact1","Group Call",12345678,"My Radio",
+    defaults = [1,"KO6DVB",440.65000,445.65000,"A-Analog","Turbo","25K","Off",94.8,"Contact1","Group Call",12345678,"My Radio",
                 "Off","Carrier","Off",1,1,1,"Off",1,1,"None","None","Off","Off","Off","Off","Normal Encryption","Off","Off",
                 "Off","Off",251.1,0,"Off","On","Off","Off","Off","Off",1,0,"Off",0,0,0,0,0,0,0,0]
     colnum = 2
@@ -61,6 +61,7 @@ def populate_anytone(workbook, anytone_sheet_name='Anytone', source_sheet_name='
             # handle 9 tx ctcss
             if cell.column == 9:
                 cell.value = source_sheet.cell(row=row_idx, column=11).value
+
 
 def translate_repeaterbook(workbook, sheet_name):
     "translate the named sheet from repeaterbook to ft70 format"
