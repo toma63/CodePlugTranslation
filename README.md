@@ -1,0 +1,1 @@
+A python program which works on Excel spreadsheets.  It can translate repeaterbook export to rtsystems Yaesu FT-70 format, and FT-70 format to Anytone 878UVIIPlus CPS format.  Currently set up for CPS 2.05.
